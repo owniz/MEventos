@@ -26,6 +26,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 
+import controller.Borrados;
 import controller.Consultas;
 import controller.Inserciones;
 import models.CiudadEvento;
@@ -47,6 +48,11 @@ public class PanelMEvento extends JFrame implements ActionListener, MouseListene
 	private JButton botonSuscribirse, botonBorrarEvento;
 	private Usuario usuario;
 	private Evento evento;
+	private ArrayList<Evento> eventos;
+	private ArrayList<CiudadEvento> ciudadEventos;
+	private CiudadEvento ciudadEvento;
+	
+	private int filaDispo;
 	
 	public PanelMEvento(Usuario usuario) {
 		super("MEvento");
@@ -101,7 +107,9 @@ public class PanelMEvento extends JFrame implements ActionListener, MouseListene
 		jtpTabs.addTab("Suscrito", jpTabEventosSuscritos);
 		jtpTabs.addTab("Usuario", jpTabUsuario);
 		jpGeneral.add(jtpTabs);
-				
+		
+		/* PESTAÑA EVENTOS DISPONIBLES*/		
+		
 		// panel de eventos disponibles
 		jlTitulo = new JLabel("EVENTOS DISPONIBLES");
 		jlTitulo.setBounds(10, 10, 270, 20);
@@ -187,10 +195,20 @@ public class PanelMEvento extends JFrame implements ActionListener, MouseListene
 		} else if(e.getSource() == jmiAcercaDe) {
 			
 		} else if(e.getSource() == botonBorrarEvento) {
+			System.out.println(ciudadEventos.get(filaDispo).getIdCiudadEvento());
+			Borrados.borrarEventoDisponible(ciudadEventos.get(filaDispo).getIdCiudadEvento());
+			modeloTablaEventosDisponibles.removeRow(filaDispo);
+			JOptionPane.showMessageDialog(this, "Evento \"" + evento.getDenominacion() + "\"ha sido borrado con exito");
 			
 		} else if(e.getSource() == botonSuscribirse) {
-			Inserciones.insertarEventoSuscrito(usuario, evento);
-			JOptionPane.showMessageDialog(this, "Te has suscrito al evento: " + evento.getDenominacion());
+			Iterator iter = Consultas.consultarSiEstasuscrito(usuario.getIdUsuario(), evento.getIdEvento());
+			
+			if(iter.hasNext()) {
+				JOptionPane.showMessageDialog(this, "Ya estás suscrito al evento: " + evento.getDenominacion());
+			} else {
+				Inserciones.insertarEventoSuscrito(usuario, evento);
+				JOptionPane.showMessageDialog(this, "Te has suscrito al evento: " + evento.getDenominacion());
+			}
 		}
 	}
 
@@ -203,21 +221,25 @@ public class PanelMEvento extends JFrame implements ActionListener, MouseListene
 		 
 		ArrayList<String> descripcionEventos = new ArrayList<>();
 		ArrayList<String> imagenEventos = new ArrayList<>();
+		eventos = new ArrayList<>();
+		ciudadEventos = new ArrayList<>();
 		
 		while(iter.hasNext()) {
-			CiudadEvento ciudadEvento = (CiudadEvento) iter.next();
-			
-			evento = ciudadEvento.getEvento();
+			ciudadEvento = (CiudadEvento) iter.next();
+
+			ciudadEventos.add(ciudadEvento);
+			eventos.add(ciudadEvento.getEvento());
 			
 			descripcionEventos.add(ciudadEvento.getEvento().getDescripcion());
 			imagenEventos.add(ciudadEvento.getEvento().getPath());
 		}
-		
-		int filaDispo = tablaEventosDisponibles.rowAtPoint(arg0.getPoint());
+			
+		filaDispo = tablaEventosDisponibles.rowAtPoint(arg0.getPoint());
 		
 		if(filaDispo >= 0) {
 			jtaDescripcion.setText(descripcionEventos.get(filaDispo));
 			ponerImagenEvento(imagenEventos.get(filaDispo));
+			evento = eventos.get(filaDispo); 
 		}
 	}
 
