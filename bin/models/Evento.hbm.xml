@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 10-feb-2017 9:21:19 by Hibernate Tools 4.3.1.Final -->
+<hibernate-mapping>
+    <class name="models.Evento" table="evento" catalog="m_eventos" optimistic-lock="version">
+        <id name="idEvento" type="java.lang.Integer">
+            <column name="id_evento" />
+            <generator class="identity" />
+        </id>
+        <property name="denominacion" type="string">
+            <column name="denominacion" length="50" />
+        </property>
+        <property name="horaInicio" type="string">
+            <column name="hora_inicio" length="5" />
+        </property>
+        <property name="horaFin" type="string">
+            <column name="hora_fin" length="5" />
+        </property>
+        <property name="descripcion" type="string">
+            <column name="descripcion" length="200" />
+        </property>
+        <property name="path" type="string">
+            <column name="path" length="100" />
+        </property>
+        <set name="eventoSuscritos" table="evento_suscrito" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="id_evento" />
+            </key>
+            <one-to-many class="models.EventoSuscrito" />
+        </set>
+        <set name="ciudadEventos" table="ciudad_evento" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="id_evento" />
+            </key>
+            <one-to-many class="models.CiudadEvento" />
+        </set>
+    </class>
+</hibernate-mapping>

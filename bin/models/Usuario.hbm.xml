@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 10-feb-2017 9:21:19 by Hibernate Tools 4.3.1.Final -->
+<hibernate-mapping>
+    <class name="models.Usuario" table="usuario" catalog="m_eventos" optimistic-lock="version">
+        <id name="idUsuario" type="java.lang.Integer">
+            <column name="id_usuario" />
+            <generator class="identity" />
+        </id>
+        <property name="nombre" type="string">
+            <column name="nombre" length="50" />
+        </property>
+        <property name="apellidos" type="string">
+            <column name="apellidos" length="50" />
+        </property>
+        <property name="edad" type="java.lang.Integer">
+            <column name="edad" />
+        </property>
+        <property name="telefono" type="string">
+            <column name="telefono" length="9" />
+        </property>
+        <property name="email" type="string">
+            <column name="email" length="20" />
+        </property>
+        <property name="passUsuario" type="string">
+            <column name="pass_usuario" length="20" />
+        </property>
+        <property name="admin" type="java.lang.Boolean">
+            <column name="admin" />
+        </property>
+        <set name="eventoSuscritos" table="evento_suscrito" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="id_usuario" />
+            </key>
+            <one-to-many class="models.EventoSuscrito" />
+        </set>
+    </class>
+</hibernate-mapping>
