@@ -19,9 +19,10 @@ import javax.swing.JTextField;
 
 import controller.Consultas;
 import controller.Inserciones;
+import models.Usuario;
 
 public class LoginFrame extends JFrame implements ActionListener {
-	private JLabel jlEmail, jlPassword, jpImagen;
+	private JLabel jlEmail, jlPassword, jlImagen;
 	private JTextField jtfEmail;
 	private JPasswordField jtfPassword;
 	private JButton botonOK, botonRegistrar;
@@ -54,12 +55,12 @@ public class LoginFrame extends JFrame implements ActionListener {
         add(jlPassword);
         add(jtfPassword);
          
-        jpImagen = new JLabel();
-        jpImagen.setBounds(120, 10, 250, 120);
+        jlImagen = new JLabel();
+        jlImagen.setBounds(120, 10, 250, 120);
         ImageIcon imagen= new  ImageIcon(getClass().getResource("/img/logo.png"));
-        Icon iconImagen = new ImageIcon(imagen.getImage().getScaledInstance(jpImagen.getWidth(), jpImagen.getHeight(), Image.SCALE_DEFAULT));
-        jpImagen.setIcon(iconImagen);
-        add(jpImagen);
+        Icon iconImagen = new ImageIcon(imagen.getImage().getScaledInstance(jlImagen.getWidth(), jlImagen.getHeight(), Image.SCALE_DEFAULT));
+        jlImagen.setIcon(iconImagen);
+        add(jlImagen);
         
         botonOK = new JButton("OK");
         botonOK.setBackground(new Color(5, 60, 70));
@@ -91,15 +92,16 @@ public class LoginFrame extends JFrame implements ActionListener {
 			Iterator iter = Consultas.consultarLogin(email, password);
 			
 			if(iter.hasNext() && !email.isEmpty() && !password.isEmpty()) {
+				Usuario usuario = (Usuario) iter.next();
 				setVisible(false);
-				new PanelMEvento();
+				new PanelMEvento(usuario);
 			} else {
-				JOptionPane.showMessageDialog(this, "Usuario o contrase�a mal introducidos");
+				JOptionPane.showMessageDialog(this, "Usuario o contraseña mal introducidos");
 			}
 		} else if(e.getSource() == botonRegistrar) {
 			PanelRegistro panelRegistro = new PanelRegistro();
 			
-			if(JOptionPane.showConfirmDialog(this, panelRegistro,  "Introduzca datos", JOptionPane.OK_CANCEL_OPTION,
+			if(JOptionPane.showConfirmDialog(this, panelRegistro,  "Introduzca sus datos", JOptionPane.OK_CANCEL_OPTION,
 					JOptionPane.PLAIN_MESSAGE) == JOptionPane.OK_OPTION) {
 				
 				String nombre = panelRegistro.getNombre().trim();

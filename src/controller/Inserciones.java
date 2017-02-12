@@ -3,6 +3,8 @@ package controller;
 import org.hibernate.Session;
 
 import models.Ciudad;
+import models.Evento;
+import models.EventoSuscrito;
 import models.Usuario;
 import utils.ConexionBaseDatos;
 
@@ -29,8 +31,19 @@ public class Inserciones {
 		
 	}
 	
-	public static void insertarEventoSuscrito() {
+	public static void insertarEventoSuscrito(Usuario usuario, Evento evento) {
+		Session sesion = ConexionBaseDatos.conectarBBDD();
 		
+		EventoSuscrito eventoSuscrito = new EventoSuscrito();
+		
+		eventoSuscrito.setEvento(evento);
+		eventoSuscrito.setUsuario(usuario);
+		eventoSuscrito.setPath(evento.getPath());
+		
+		sesion.beginTransaction();
+		sesion.persist(eventoSuscrito);
+		sesion.getTransaction().commit();
+		sesion.close();
 	}
 	
 	public static void insertarUsuario(String nombre, String apellidos, int edad, String telefono, String email, String password) {

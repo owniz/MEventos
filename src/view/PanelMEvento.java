@@ -3,6 +3,7 @@ package view;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -10,11 +11,15 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -22,8 +27,11 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 
 import controller.Consultas;
+import controller.Inserciones;
 import models.CiudadEvento;
+import models.Evento;
 import models.ModeloTablaEventos;
+import models.Usuario;
 
 public class PanelMEvento extends JFrame implements ActionListener, MouseListener {
 	private JPanel jpGeneral, jpTabEventosDisponibles, jpTabEventosSuscritos, jpTabUsuario;
@@ -31,14 +39,18 @@ public class PanelMEvento extends JFrame implements ActionListener, MouseListene
 	private JMenu menuArchivo, menuAyuda;
 	private JMenuItem jmiCerrarSesion, jmiSalir, jmiContenidoAyuda, jmiAcercaDe;
 	private JTabbedPane jtpTabs;
-	private JLabel jlTitulo, jlTituloDescripcion;
+	private JLabel jlTitulo, jlTituloDescripcion, jlImagenEvento;
 	private JTextArea jtaDescripcion;
 	private ModeloTablaEventos modeloTablaEventosDisponibles;
 	private JTable tablaEventosDisponibles;
 	private JScrollPane scrollTablaEventosDisponibles;
+	private JButton botonSuscribirse, botonBorrarEvento;
+	private Usuario usuario;
+	private Evento evento;
 	
-	public PanelMEvento() {
+	public PanelMEvento(Usuario usuario) {
 		super("MEvento");
+		this.usuario = usuario;
 		iniciarGUI();
 	}
 	
@@ -97,6 +109,24 @@ public class PanelMEvento extends JFrame implements ActionListener, MouseListene
 		jlTitulo.setForeground(new Color(5, 60, 80));
 		jpTabEventosDisponibles.add(jlTitulo);
 		
+		// botones
+		botonSuscribirse = new JButton("Suscribirse");
+		botonSuscribirse.setBounds(520, 10, 120, 25);
+		botonSuscribirse.setBackground(Color.LIGHT_GRAY);	
+		botonSuscribirse.setForeground(Color.WHITE);
+		botonSuscribirse.setEnabled(false);
+		botonSuscribirse.addActionListener(this);
+        jpTabEventosDisponibles.add(botonSuscribirse);
+        
+        if(usuario.getAdmin()) { // sólo aparece si eres administrador
+	        botonBorrarEvento = new JButton("Borrar Evento");
+	        botonBorrarEvento.setBounds(320, 10, 140, 25);
+	        botonBorrarEvento.setBackground(Color.RED);
+	        botonBorrarEvento.setForeground(Color.WHITE);
+	        botonBorrarEvento.addActionListener(this);
+	        jpTabEventosDisponibles.add(botonBorrarEvento);
+        }
+		
 		// tabla de eventos diponibles
 		modeloTablaEventosDisponibles = new ModeloTablaEventos();
 		tablaEventosDisponibles = new JTable(modeloTablaEventosDisponibles);
@@ -126,12 +156,23 @@ public class PanelMEvento extends JFrame implements ActionListener, MouseListene
 		jtaDescripcion.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 14));
 		jpTabEventosDisponibles.add(jtaDescripcion);
 		
+		// imagen del evento
+		jlImagenEvento = new JLabel();
+		jlImagenEvento.setBounds(399, 300, 240, 140);
+        jpTabEventosDisponibles.add(jlImagenEvento);
+		
 		// configuracón ventana
 		setSize(800, 500);
         setVisible(true);
         setResizable(false);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+	}
+	
+	public void ponerImagenEvento(String imagenPath) {
+		ImageIcon imagen= new  ImageIcon(getClass().getResource(imagenPath));
+        Icon iconImagen = new ImageIcon(imagen.getImage().getScaledInstance(jlImagenEvento.getWidth(), jlImagenEvento.getHeight(), Image.SCALE_DEFAULT));
+        jlImagenEvento.setIcon(iconImagen);
 	}
 
 	@Override
@@ -145,26 +186,38 @@ public class PanelMEvento extends JFrame implements ActionListener, MouseListene
 			
 		} else if(e.getSource() == jmiAcercaDe) {
 			
+		} else if(e.getSource() == botonBorrarEvento) {
+			
+		} else if(e.getSource() == botonSuscribirse) {
+			Inserciones.insertarEventoSuscrito(usuario, evento);
+			JOptionPane.showMessageDialog(this, "Te has suscrito al evento: " + evento.getDenominacion());
 		}
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
-		Iterator iter = Consultas.consultarCiudadEvento();
+		botonSuscribirse.setEnabled(true);
+		botonSuscribirse.setBackground(new Color(5, 60, 70));
 		
-		ArrayList<String> descripciones = new ArrayList<>();
+		Iterator iter = Consultas.consultarCiudadEvento();
+		 
+		ArrayList<String> descripcionEventos = new ArrayList<>();
+		ArrayList<String> imagenEventos = new ArrayList<>();
 		
 		while(iter.hasNext()) {
 			CiudadEvento ciudadEvento = (CiudadEvento) iter.next();
 			
-			descripciones.add(ciudadEvento.getEvento().getDescripcion());
+			evento = ciudadEvento.getEvento();
+			
+			descripcionEventos.add(ciudadEvento.getEvento().getDescripcion());
+			imagenEventos.add(ciudadEvento.getEvento().getPath());
 		}
 		
 		int filaDispo = tablaEventosDisponibles.rowAtPoint(arg0.getPoint());
-		int columnaDispo = tablaEventosDisponibles.columnAtPoint(arg0.getPoint());
 		
-		if(filaDispo >= 0 && columnaDispo >= 0) {
-			jtaDescripcion.setText(descripciones.get(filaDispo));
+		if(filaDispo >= 0) {
+			jtaDescripcion.setText(descripcionEventos.get(filaDispo));
+			ponerImagenEvento(imagenEventos.get(filaDispo));
 		}
 	}
 
