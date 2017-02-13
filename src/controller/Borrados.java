@@ -3,6 +3,7 @@ package controller;
 import org.hibernate.Session;
 
 import models.CiudadEvento;
+import models.Usuario;
 import utils.ConexionBaseDatos;
 
 public class Borrados {
@@ -13,6 +14,17 @@ public class Borrados {
 		
 		sesion.beginTransaction();
 		sesion.delete(ciudadEvento);
+		sesion.getTransaction().commit();
+		sesion.close();
+	}
+	
+	public static void borrarUsuario(int idUsuario) {		
+		Session sesion = ConexionBaseDatos.conectarBBDD();
+		
+		Usuario usuario = (Usuario) sesion.get(Usuario.class, idUsuario);
+		
+		sesion.beginTransaction();
+		sesion.delete(usuario);
 		sesion.getTransaction().commit();
 		sesion.close();
 	}

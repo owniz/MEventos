@@ -3,6 +3,7 @@ package view;
 
 import java.awt.Color;
 import java.awt.Image;
+import java.awt.Label;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 
 import controller.Consultas;
 import controller.Inserciones;
@@ -36,9 +38,8 @@ public class LoginFrame extends JFrame implements ActionListener {
 		setLayout(null); 
 		getContentPane().setBackground(Color.WHITE);
 		
-		/*Image icono = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/img/logo.png"));
-		ImageIcon icon = new ImageIcon();
-		setIconImage(icon.getImage());*/
+		ImageIcon icon = new ImageIcon(getClass().getResource("/img/logo_icono.png"));
+		setIconImage(icon.getImage());
 		
         jlEmail = new JLabel("Email: ", JLabel.RIGHT); // coloca la etiqueta a la derecha
         jlEmail.setBounds(115, 150, 80, 20);
@@ -48,7 +49,7 @@ public class LoginFrame extends JFrame implements ActionListener {
         add(jlEmail);
         add(jtfEmail);
         
-        jlPassword = new JLabel("Contrase�a: ", JLabel.RIGHT); // coloca la etiqueta a la derecha
+        jlPassword = new JLabel("Contraseña: ", JLabel.RIGHT); // coloca la etiqueta a la derecha
         jlPassword.setBounds(150, 180, 80, 20);
         jtfPassword = new JPasswordField();
         jtfPassword.setBounds(240, 180, 100, 20);

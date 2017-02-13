@@ -30,6 +30,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.text.MaskFormatter;
 
+import controller.Actualizar;
 import controller.Borrados;
 import controller.Consultas;
 import controller.Inserciones;
@@ -46,21 +47,26 @@ public class PanelMEvento extends JFrame implements ActionListener {
 	private JMenu menuArchivo, menuAyuda;
 	private JMenuItem jmiCerrarSesion, jmiSalir, jmiContenidoAyuda, jmiAcercaDe;
 	private JTabbedPane jtpTabs;
-	private JLabel jlTitulo, jlTitulo2, jlTituloDescripcion, jlTituloValorarion, jlImagenEvento, jlImagenEventoSuscrito;
+	private JLabel jlTituloEventosDispo, jlTituloEventosSus, jlTituloUsuario; 
+	private JLabel jlTituloDescripcion, jlTituloValorarion, jlImagenEvento, jlImagenEventoSuscrito;
 	private JTextArea jtaDescripcion;
 	private JFormattedTextField jtaValoracion;
 	private ModeloTablaEventos modeloTablaEventosDisponibles;
 	private ModeloTablaEventosSuscrito modeloTablaEventosSuscrito;
 	private JTable tablaEventosDisponibles, tablaEventosSuscrito;
 	private JScrollPane scrollTablaEventosDisponibles, scrollTablaEventosSuscrito;
-	private JButton botonSuscribirse, botonBorrarEvento, botonGuardarValoracion;
+	private JButton botonSuscribirse, botonBorrarEvento, botonGuardarValoracion, botonBorrarUsuario, botonGuardarDatosUsuario;
 	private Usuario usuario;
 	private Evento evento;
+	private EventoSuscrito eventoSuscrito;
+	private PanelRegistro panelRegistro;
 	private ArrayList<Evento> eventos;
 	private ArrayList<CiudadEvento> ciudadEventos;
+	private ArrayList<EventoSuscrito> arrayEventosSuscrito;
 	private CiudadEvento ciudadEvento;
 	
 	private int filaDispo;
+	private int filaSuscrito;
 	
 	public PanelMEvento(Usuario usuario) {
 		super("MEvento");
@@ -119,11 +125,11 @@ public class PanelMEvento extends JFrame implements ActionListener {
 		/* PESTAÑA EVENTOS DISPONIBLES*/		
 		
 		// título
-		jlTitulo = new JLabel("EVENTOS DISPONIBLES");
-		jlTitulo.setBounds(10, 10, 270, 20);
-		jlTitulo.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
-		jlTitulo.setForeground(new Color(5, 60, 80));
-		jpTabEventosDisponibles.add(jlTitulo);
+		jlTituloEventosDispo = new JLabel("EVENTOS DISPONIBLES");
+		jlTituloEventosDispo.setBounds(10, 10, 270, 20);
+		jlTituloEventosDispo.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
+		jlTituloEventosDispo.setForeground(new Color(5, 60, 80));
+		jpTabEventosDisponibles.add(jlTituloEventosDispo);
 		
 		// botones
 		botonSuscribirse = new JButton("Suscribirse");
@@ -152,9 +158,10 @@ public class PanelMEvento extends JFrame implements ActionListener {
 		tablaEventosDisponibles.getColumnModel().getColumn(1).setMinWidth(80);
 		tablaEventosDisponibles.getColumnModel().getColumn(2).setMaxWidth(80);
 		tablaEventosDisponibles.getColumnModel().getColumn(2).setMinWidth(80);
-		tablaEventosDisponibles.getColumnModel().getColumn(3).setMaxWidth(100);
-		tablaEventosDisponibles.getColumnModel().getColumn(3).setMinWidth(100);
-		//tablaEventosDisponibles.addMouseListener(this);
+		tablaEventosDisponibles.getColumnModel().getColumn(3).setMaxWidth(80);
+		tablaEventosDisponibles.getColumnModel().getColumn(3).setMinWidth(80);
+		tablaEventosDisponibles.getColumnModel().getColumn(4).setMaxWidth(100);
+		tablaEventosDisponibles.getColumnModel().getColumn(4).setMinWidth(100);
 		tablaEventosDisponibles.addMouseListener(new MouseListener() {
 
 			@Override
@@ -186,9 +193,9 @@ public class PanelMEvento extends JFrame implements ActionListener {
 				filaDispo = tablaEventosDisponibles.rowAtPoint(arg0.getPoint());
 				
 				if(filaDispo >= 0) {
-					jtaDescripcion.setText(descripcionEventos.get(filaDispo));
-					ponerImagenEventoDispo(imagenEventos.get(filaDispo));
-					evento = eventos.get(filaDispo); 
+					jtaDescripcion.setText(descripcionEventos.get(filaDispo + 1));
+					ponerImagenEventoDispo(imagenEventos.get(filaDispo + 1));
+					evento = eventos.get(filaDispo + 1); 
 				}
 			}
 
@@ -231,11 +238,11 @@ public class PanelMEvento extends JFrame implements ActionListener {
         /* PESTAÑA EVENTOS SUSCRITO */
         
 		// título
-        jlTitulo2 = new JLabel("EVENTOS SUSCRITO");
-		jlTitulo2.setBounds(10, 10, 270, 20);
-		jlTitulo2.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
-		jlTitulo2.setForeground(new Color(5, 60, 80));
-		jpTabEventosSuscritos.add(jlTitulo2);
+        jlTituloEventosSus = new JLabel("EVENTOS SUSCRITO");
+		jlTituloEventosSus.setBounds(10, 10, 270, 20);
+		jlTituloEventosSus.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
+		jlTituloEventosSus.setForeground(new Color(5, 60, 80));
+		jpTabEventosSuscritos.add(jlTituloEventosSus);
         
 		// tabla de eventos diponibles
 		modeloTablaEventosSuscrito = new ModeloTablaEventosSuscrito(usuario.getIdUsuario());
@@ -254,19 +261,21 @@ public class PanelMEvento extends JFrame implements ActionListener {
 				
 				ArrayList<String> valoracionEventos = new ArrayList<>();
 				ArrayList<String> imagenEventos = new ArrayList<>();
+				arrayEventosSuscrito = new ArrayList<>();
 				
 				while(iter.hasNext()) {
-					EventoSuscrito eventoSuscrito = (EventoSuscrito) iter.next();
+					eventoSuscrito = (EventoSuscrito) iter.next();
 
 					valoracionEventos.add(eventoSuscrito.getValoracion());
 					imagenEventos.add(eventoSuscrito.getEvento().getPath());
+					arrayEventosSuscrito.add(eventoSuscrito);
 				}
 					
-				filaDispo = tablaEventosDisponibles.rowAtPoint(e.getPoint());
+				filaSuscrito = tablaEventosDisponibles.rowAtPoint(e.getPoint());
 				
-				if(filaDispo >= 0) {
-					jtaValoracion.setText(valoracionEventos.get(filaDispo));
-					ponerImagenEventoSuscrito(imagenEventos.get(filaDispo)); 
+				if(filaSuscrito >= 0) {
+					jtaValoracion.setText(valoracionEventos.get(filaSuscrito));
+					ponerImagenEventoSuscrito(imagenEventos.get(filaSuscrito));					
 				}
 			}
 
@@ -322,6 +331,42 @@ public class PanelMEvento extends JFrame implements ActionListener {
 		botonGuardarValoracion.addActionListener(this);
 		jpTabEventosSuscritos.add(botonGuardarValoracion);
         
+		/* PESTAÑA USUARIO */	
+		
+		// título usuario
+		jlTituloUsuario = new JLabel("DATOS USUARIO");
+		jlTituloUsuario.setBounds(10, 10, 270, 20);
+		jlTituloUsuario.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
+		jlTituloUsuario.setForeground(new Color(5, 60, 80));
+		jpTabUsuario.add(jlTituloUsuario);
+		
+		// panel datos usuario
+		panelRegistro = new PanelRegistro();
+		panelRegistro.setBounds(20, 50, 450, 250);
+		panelRegistro.setBackground(Color.WHITE);
+		panelRegistro.setNombre(usuario.getNombre());
+		panelRegistro.setApellidos(usuario.getApellidos());
+		panelRegistro.setEdad(usuario.getEdad());
+		panelRegistro.setTelefono(usuario.getTelefono());
+		panelRegistro.setEmail(usuario.getEmail());
+		panelRegistro.setPassword(usuario.getPassUsuario());
+		jpTabUsuario.add(panelRegistro);
+		
+		// botones
+		botonBorrarUsuario = new JButton("Borrar Usuario");
+		botonBorrarUsuario.setBounds(90, 340, 170, 55);
+		botonBorrarUsuario.setBackground(Color.RED);	
+		botonBorrarUsuario.setForeground(Color.WHITE);
+		botonBorrarUsuario.addActionListener(this);
+        jpTabUsuario.add(botonBorrarUsuario);
+		
+		botonGuardarDatosUsuario = new JButton("Actualizar Cambios");
+		botonGuardarDatosUsuario.setBounds(410, 340, 170, 55);
+		botonGuardarDatosUsuario.setBackground(new Color(5, 60, 70));	
+		botonGuardarDatosUsuario.setForeground(Color.WHITE);
+		botonGuardarDatosUsuario.addActionListener(this);
+        jpTabUsuario.add(botonGuardarDatosUsuario);
+		
 		// configuracón ventana
 		setSize(800, 500);
         setVisible(true);
@@ -332,13 +377,15 @@ public class PanelMEvento extends JFrame implements ActionListener {
 	
 	public void ponerImagenEventoDispo(String imagenPath) {
 		ImageIcon imagen= new  ImageIcon(getClass().getResource(imagenPath));
-        Icon iconImagen = new ImageIcon(imagen.getImage().getScaledInstance(jlImagenEvento.getWidth(), jlImagenEvento.getHeight(), Image.SCALE_DEFAULT));
+        Icon iconImagen = new ImageIcon(imagen.getImage().getScaledInstance(jlImagenEvento.getWidth(),
+        											jlImagenEvento.getHeight(), Image.SCALE_DEFAULT));
         jlImagenEvento.setIcon(iconImagen);
 	}
 	
 	public void ponerImagenEventoSuscrito(String imagenPath) {
 		ImageIcon imagen= new  ImageIcon(getClass().getResource(imagenPath));
-        Icon iconImagen = new ImageIcon(imagen.getImage().getScaledInstance(jlImagenEventoSuscrito.getWidth(), jlImagenEventoSuscrito.getHeight(), Image.SCALE_DEFAULT));
+        Icon iconImagen = new ImageIcon(imagen.getImage().getScaledInstance(jlImagenEventoSuscrito.getWidth(),
+        											jlImagenEventoSuscrito.getHeight(), Image.SCALE_DEFAULT));
         jlImagenEventoSuscrito.setIcon(iconImagen);
 	}
 
@@ -352,12 +399,18 @@ public class PanelMEvento extends JFrame implements ActionListener {
 		} else if(e.getSource() == jmiContenidoAyuda) {
 			
 		} else if(e.getSource() == jmiAcercaDe) {
-			
+			JOptionPane.showMessageDialog(this, "Aplicación realizada para los modulos de:\n\t- Diseño de interfaces"
+					+ "\n\t- Acceso a Datos\n\t- Sistemas de gestión empresarial\n\nPor los alumnos:"
+					+ "\n\t- Javier Morales\n\t- Luis Morales");
 		} else if(e.getSource() == botonBorrarEvento) {
-			System.out.println(ciudadEventos.get(filaDispo).getIdCiudadEvento());
-			Borrados.borrarEventoDisponible(ciudadEventos.get(filaDispo).getIdCiudadEvento());
-			modeloTablaEventosDisponibles.removeRow(filaDispo);
-			JOptionPane.showMessageDialog(this, "Evento \"" + evento.getDenominacion() + "\"ha sido borrado con exito");
+			if(JOptionPane.showConfirmDialog(this, "Esta seguro que desea borrar el evento: " + evento.getDenominacion(),
+														"Borrar evento", JOptionPane.OK_CANCEL_OPTION,
+														JOptionPane.PLAIN_MESSAGE) == JOptionPane.OK_OPTION) {
+				System.out.println(ciudadEventos.get(filaDispo).getIdCiudadEvento());
+				Borrados.borrarEventoDisponible(ciudadEventos.get(filaDispo).getIdCiudadEvento());
+				modeloTablaEventosDisponibles.removeRow(filaDispo);
+				JOptionPane.showMessageDialog(this, "Evento \"" + evento.getDenominacion() + "\" ha sido borrado con exito");
+			}
 			
 		} else if(e.getSource() == botonSuscribirse) {
 			Iterator iter = Consultas.consultarSiEstasuscrito(usuario.getIdUsuario(), evento.getIdEvento());
@@ -367,10 +420,24 @@ public class PanelMEvento extends JFrame implements ActionListener {
 			} else {
 				Inserciones.insertarEventoSuscrito(usuario, evento);
 				JOptionPane.showMessageDialog(this, "Te has suscrito al evento: " + evento.getDenominacion());
-				modeloTablaEventosSuscrito.addRow(new Object[] {evento.getDenominacion(), "2020-10-01"});
+				modeloTablaEventosSuscrito.addRow(new Object[] {evento.getDenominacion(), evento.getFecha()});
 			}
 		} else if(e.getSource() == botonGuardarValoracion) {
-			
+			Actualizar.actualizarNotaEvento(arrayEventosSuscrito.get(filaSuscrito), jtaValoracion.getText());
+			JOptionPane.showMessageDialog(this, "Anotaciones actualizadas para el evento: "
+									+ arrayEventosSuscrito.get(filaSuscrito).getEvento().getDenominacion());
+		} else if(e.getSource() == botonBorrarUsuario) {
+			if(JOptionPane.showConfirmDialog(this, "Esta seguro que desea borrar su usuario", "Borrar Usuario", JOptionPane.OK_CANCEL_OPTION,
+																JOptionPane.PLAIN_MESSAGE) == JOptionPane.OK_OPTION) {
+					Borrados.borrarUsuario(usuario.getIdUsuario());
+					setVisible(false);
+					new LoginFrame();		
+			}
+		} else if(e.getSource() == botonGuardarDatosUsuario) {			
+			Actualizar.actualizarUsuario(usuario, panelRegistro.getNombre().trim(), panelRegistro.getApellidos().trim(),
+					panelRegistro.getEdad().trim(), panelRegistro.getTelefono().trim(), panelRegistro.getEmail().trim(),
+					panelRegistro.getPassword().trim());
+			JOptionPane.showMessageDialog(this, "Usuario: " + usuario.getNombre().trim() + " actualizado");
 		}
 	}
 }

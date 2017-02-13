@@ -22,27 +22,51 @@ public class PanelRegistro extends JPanel implements ActionListener {
 	}
 	
 	public String getNombre() {
-		return campoNombre.getText();
+		return campoNombre.getText().trim();
 	}
 
 	public String getApellidos() {
-		return campoApellidos.getText();
+		return campoApellidos.getText().trim();
 	}
 
 	public String getEdad() {
-		return String.valueOf(edadSeleccionada = (edadSeleccionada == 0) ? edadSeleccionada + 14 : edadSeleccionada);
+		return String.valueOf(edadSeleccionada = (edadSeleccionada == 0) ? edadSeleccionada + 14 : edadSeleccionada).trim();
 	}
 
 	public String getTelefono() {
-		return campoTelefono.getText();
+		return campoTelefono.getText().trim();
 	}
 
 	public String getEmail() {
-		return campoEmail.getText();
+		return campoEmail.getText().trim();
 	}
 
 	public String getPassword() {
-		return campoPassword.getText();
+		return campoPassword.getText().trim();
+	}
+	
+	public void setNombre(String nombre) {
+		campoNombre.setText(nombre);
+	}
+	
+	public void setApellidos(String apellidos) {
+		campoApellidos.setText(apellidos);
+	}
+	
+	public void setEdad(int edadSeleccionada) {
+		jcbEdad.setSelectedIndex(edadSeleccionada - 14);
+	}
+	
+	public void setTelefono(String telefono) {
+		campoTelefono.setText(telefono);
+	}
+	
+	public void setEmail(String email) {
+		campoEmail.setText(email);
+	}
+	
+	public void setPassword(String password) {
+		campoPassword.setText(password);
 	}
 	
 	public void iniciarGUI() {
@@ -86,7 +110,7 @@ public class PanelRegistro extends JPanel implements ActionListener {
 		add(jlEdad);
 		add(jcbEdad);
 		
-		JLabel jlTelefono = new JLabel("Tel�fono: ", JLabel.RIGHT);
+		JLabel jlTelefono = new JLabel("Teléfono: ", JLabel.RIGHT);
 		try {
 			MaskFormatter formatter = new MaskFormatter("*********");
 			campoTelefono = new JFormattedTextField(formatter);			
@@ -106,7 +130,7 @@ public class PanelRegistro extends JPanel implements ActionListener {
 		add(jlEmail);
 		add(campoEmail);
 		
-		JLabel jlPassword = new JLabel("Contrase�a: ", JLabel.RIGHT);
+		JLabel jlPassword = new JLabel("Contraseña: ", JLabel.RIGHT);
 		try {
 			MaskFormatter formatter = new MaskFormatter("****************************************");
 			campoPassword = new JFormattedTextField(formatter);

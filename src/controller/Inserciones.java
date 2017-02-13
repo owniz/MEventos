@@ -23,14 +23,6 @@ public class Inserciones {
 		sesion.close();
 	}
 	
-	public static void insertarCiudadEvento() {
-		
-	}
-	
-	public static void insertarEvento() {
-		
-	}
-	
 	public static void insertarEventoSuscrito(Usuario usuario, Evento evento) {
 		Session sesion = ConexionBaseDatos.conectarBBDD();
 		
@@ -57,6 +49,7 @@ public class Inserciones {
 		usuario.setTelefono(telefono);
 		usuario.setEmail(email);
 		usuario.setPassUsuario(password);
+		usuario.setAdmin(false);
 		
 		sesion.beginTransaction();
 		sesion.persist(usuario);

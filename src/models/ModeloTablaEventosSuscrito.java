@@ -26,16 +26,7 @@ public class ModeloTablaEventosSuscrito extends DefaultTableModel {
 			EventoSuscrito eventoSuscrito = (EventoSuscrito) iter.next();
 			
 			nombreEventos.add(eventoSuscrito.getEvento().getDenominacion());
-		}
-		
-		Iterator iterFechas = Consultas.consultarCiudadEvento();
-		//Iterator iterFechas = Consultas.consultarCiudadEventoConUsuario(idUsuario);
-		
-		while(iterFechas.hasNext()) {
-			CiudadEvento ciudadEvento = (CiudadEvento) iterFechas.next();
-			
-			//nombreEventos.add(ciudadEvento.getEvento().getDenominacion());
-			fechaEventos.add((Date) ciudadEvento.getEvento().getFecha());
+			fechaEventos.add((Date) eventoSuscrito.getEvento().getFecha());
 		}
 		
 		String[] columnas = {"Nombre Evento", "Fecha"};
