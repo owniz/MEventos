@@ -14,11 +14,4 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>src/img/smile.png</name>
-			<type>1</type>
-			<locationURI>PARENT-7-PROJECT_LOC/home/owniz/Descargas/smile.png</locationURI>
-		</link>
-	</linkedResources>
 </projectDescription>

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<!-- Generated 10-feb-2017 9:21:19 by Hibernate Tools 4.3.1.Final -->
+<!-- Generated 13-feb-2017 16:09:05 by Hibernate Tools 4.3.1.Final -->
 <hibernate-mapping>
     <class name="models.Ciudad" table="ciudad" catalog="m_eventos" optimistic-lock="version">
         <id name="idCiudad" type="java.lang.Integer">

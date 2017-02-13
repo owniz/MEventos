@@ -21,6 +21,14 @@ public class Consultas {
 		return iter;
 	}
 	
+	public static Iterator consultarCiudadEventoConUsuario(int usuario) {
+		Session sesion = ConexionBaseDatos.conectarBBDD();		
+		Iterator iter = sesion.createQuery("from CiudadEvento cu, Usuario u where cu.fecha > sysdate() and u.id_usuario = " + usuario
+				+ " and cu.id_evento = u.id_evento").iterate();		
+		//sesion.close();		
+		return iter;
+	}
+	
 	public static Iterator consultarEvento() {
 		Session sesion = ConexionBaseDatos.conectarBBDD();		
 		Iterator iter = sesion.createQuery("from Evento").iterate();
@@ -28,9 +36,9 @@ public class Consultas {
 		return iter;
 	}
 	
-	public static Iterator consultarEventoSuscrito() {
+	public static Iterator consultarEventoSuscrito(int idUsuario) {
 		Session sesion = ConexionBaseDatos.conectarBBDD();		
-		Iterator iter = sesion.createQuery("from EventoSuscrito").iterate();		
+		Iterator iter = sesion.createQuery("from EventoSuscrito where id_usuario = " + idUsuario).iterate();		
 		//sesion.close();		
 		return iter;
 	}
