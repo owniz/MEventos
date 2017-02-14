@@ -6,7 +6,13 @@ import models.EventoSuscrito;
 import models.Usuario;
 import utils.ConexionBaseDatos;
 
+/*
+ * Clase para realizar las actualizaciones de la BBDD
+ */
+
 public class Actualizar {
+	
+	// actualizamos las notas de los eventos a los que está suscrito el usuario
 	public static void actualizarNotaEvento(EventoSuscrito eventoSuscrito, String valoracion) {
 		Session sesion = ConexionBaseDatos.conectarBBDD();
 		
@@ -20,6 +26,7 @@ public class Actualizar {
 		sesion.close();
 	}
 	
+	// actualizamos los datos del usuario
 	public static void actualizarUsuario(Usuario usuario, String nombre, String apellidos, String edad,
 													String telefono, String email, String passUsuario) {
 		Session sesion = ConexionBaseDatos.conectarBBDD();

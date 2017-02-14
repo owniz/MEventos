@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -41,7 +42,15 @@ import models.ModeloTablaEventos;
 import models.ModeloTablaEventosSuscrito;
 import models.Usuario;
 
+/*
+ * Panel principal de la aplicación en el que podremos ver y gestionar
+ * los eventos disponibles, a los que se suscribe el usuario y además
+ * el panel de usuario 
+ */
+
 public class PanelMEvento extends JFrame implements ActionListener {
+	
+	// componentes visuales
 	private JPanel jpGeneral, jpTabEventosDisponibles, jpTabEventosSuscritos, jpTabUsuario;
 	private JMenuBar BarraMenu;
 	private JMenu menuArchivo, menuAyuda;
@@ -51,20 +60,27 @@ public class PanelMEvento extends JFrame implements ActionListener {
 	private JLabel jlTituloDescripcion, jlTituloValorarion, jlImagenEvento, jlImagenEventoSuscrito;
 	private JTextArea jtaDescripcion;
 	private JFormattedTextField jtaValoracion;
-	private ModeloTablaEventos modeloTablaEventosDisponibles;
-	private ModeloTablaEventosSuscrito modeloTablaEventosSuscrito;
 	private JTable tablaEventosDisponibles, tablaEventosSuscrito;
 	private JScrollPane scrollTablaEventosDisponibles, scrollTablaEventosSuscrito;
 	private JButton botonSuscribirse, botonBorrarEvento, botonGuardarValoracion, botonBorrarUsuario, botonGuardarDatosUsuario;
+	private PanelRegistro panelRegistro;
+	
+	// Arrays que almacenan los datos de las tablas
+	private ArrayList<Evento> eventos;
+	private ArrayList<CiudadEvento> ciudadEventos;
+	private ArrayList<EventoSuscrito> arrayEventosSuscrito;	
+	
+	// modelos de tablas
+	private ModeloTablaEventos modeloTablaEventosDisponibles;
+	private ModeloTablaEventosSuscrito modeloTablaEventosSuscrito;
+
+	// objetos de las tablas
 	private Usuario usuario;
 	private Evento evento;
 	private EventoSuscrito eventoSuscrito;
-	private PanelRegistro panelRegistro;
-	private ArrayList<Evento> eventos;
-	private ArrayList<CiudadEvento> ciudadEventos;
-	private ArrayList<EventoSuscrito> arrayEventosSuscrito;
 	private CiudadEvento ciudadEvento;
 	
+	// almacemos las filas donde se pulsa en cada tabla
 	private int filaDispo;
 	private int filaSuscrito;
 	
@@ -76,6 +92,10 @@ public class PanelMEvento extends JFrame implements ActionListener {
 	
 	public void iniciarGUI() {		
 		jpGeneral = new JPanel();
+		
+		// icono
+		ImageIcon icon = new ImageIcon(getClass().getResource("/img/logo_icono.png"));
+		setIconImage(icon.getImage());
 		
 		// Barra de menú
 		BarraMenu = new JMenuBar();
@@ -164,15 +184,21 @@ public class PanelMEvento extends JFrame implements ActionListener {
 		tablaEventosDisponibles.getColumnModel().getColumn(4).setMinWidth(100);
 		tablaEventosDisponibles.addMouseListener(new MouseListener() {
 
+			// comportamiento al pulsar sobre la tabla de eventos diponibles
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
+				
+				// activamos los botones
 				botonSuscribirse.setEnabled(true);
 				botonSuscribirse.setBackground(new Color(5, 60, 70));
+				
+				// solo aparece si el usuario es adeministrador
 				if(usuario.getAdmin()) {
 					botonBorrarEvento.setEnabled(true);
 					botonBorrarEvento.setBackground(Color.RED);
 				}
 				
+				// mostramos los eventos disponibles
 				Iterator iter = Consultas.consultarCiudadEvento();
 				 
 				ArrayList<String> descripcionEventos = new ArrayList<>();
@@ -182,20 +208,23 @@ public class PanelMEvento extends JFrame implements ActionListener {
 				
 				while(iter.hasNext()) {
 					ciudadEvento = (CiudadEvento) iter.next();
-
+					
 					ciudadEventos.add(ciudadEvento);
 					eventos.add(ciudadEvento.getEvento());
 					
 					descripcionEventos.add(ciudadEvento.getEvento().getDescripcion());
 					imagenEventos.add(ciudadEvento.getEvento().getPath());
 				}
-					
+				
+				// guardamos la fila que es pulsada
 				filaDispo = tablaEventosDisponibles.rowAtPoint(arg0.getPoint());
 				
+				// si es mayor o igual a 0 mostramos la información y la imagen
+				// recuperamos además el evento
 				if(filaDispo >= 0) {
 					jtaDescripcion.setText(descripcionEventos.get(filaDispo + 1));
 					ponerImagenEventoDispo(imagenEventos.get(filaDispo + 1));
-					evento = eventos.get(filaDispo + 1); 
+					evento = eventos.get(filaDispo + 1);
 				}
 			}
 
@@ -252,11 +281,16 @@ public class PanelMEvento extends JFrame implements ActionListener {
 		tablaEventosSuscrito.getColumnModel().getColumn(1).setMinWidth(80);
 		tablaEventosSuscrito.addMouseListener(new MouseListener() {
 
+			// comportamiento al pulsar sobre la tabla de eventos suscrito por el usuario
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				
+				// activamos los botones y el campo para las anotaciones
 				jtaValoracion.setEnabled(true);
 				botonGuardarValoracion.setEnabled(true);
 				botonGuardarValoracion.setBackground(new Color(5, 60, 70));
+				
+				// mostramos los eventos suscritos
 				Iterator iter = Consultas.consultarEventoSuscrito(usuario.getIdUsuario());
 				
 				ArrayList<String> valoracionEventos = new ArrayList<>();
@@ -271,8 +305,10 @@ public class PanelMEvento extends JFrame implements ActionListener {
 					arrayEventosSuscrito.add(eventoSuscrito);
 				}
 					
+				// almacenamos la fila sobre la que se ha pusaldo
 				filaSuscrito = tablaEventosDisponibles.rowAtPoint(e.getPoint());
 				
+				// si es mayor o igual a 0 mostramos la imagen y las notas del evento
 				if(filaSuscrito >= 0) {
 					jtaValoracion.setText(valoracionEventos.get(filaSuscrito));
 					ponerImagenEventoSuscrito(imagenEventos.get(filaSuscrito));					
@@ -314,8 +350,6 @@ public class PanelMEvento extends JFrame implements ActionListener {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-		//jtaValoracion.setLineWrap(true); // las líneas bajan al completar la fila
-		//jtaValoracion.setWrapStyleWord(true); // no corta las palabras
 		jtaValoracion.setEnabled(false);
 		jtaValoracion.setBounds(40, 340, 600, 50);
 		jtaValoracion.setBorder(BorderFactory.createLineBorder(Color.GRAY));
@@ -367,7 +401,7 @@ public class PanelMEvento extends JFrame implements ActionListener {
 		botonGuardarDatosUsuario.addActionListener(this);
         jpTabUsuario.add(botonGuardarDatosUsuario);
 		
-		// configuracón ventana
+		// configuración ventana
 		setSize(800, 500);
         setVisible(true);
         setResizable(false);
@@ -375,13 +409,15 @@ public class PanelMEvento extends JFrame implements ActionListener {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 	}
 	
+	// muestra la imagen del evento al pulsar sobre él
 	public void ponerImagenEventoDispo(String imagenPath) {
 		ImageIcon imagen= new  ImageIcon(getClass().getResource(imagenPath));
         Icon iconImagen = new ImageIcon(imagen.getImage().getScaledInstance(jlImagenEvento.getWidth(),
         											jlImagenEvento.getHeight(), Image.SCALE_DEFAULT));
         jlImagenEvento.setIcon(iconImagen);
 	}
-	
+
+	// muestra la imagen del evento al pulsar sobre él
 	public void ponerImagenEventoSuscrito(String imagenPath) {
 		ImageIcon imagen= new  ImageIcon(getClass().getResource(imagenPath));
         Icon iconImagen = new ImageIcon(imagen.getImage().getScaledInstance(jlImagenEventoSuscrito.getWidth(),
@@ -389,29 +425,45 @@ public class PanelMEvento extends JFrame implements ActionListener {
         jlImagenEventoSuscrito.setIcon(iconImagen);
 	}
 
+	// comportamiento de los botones
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		
+		// cerrar sesión nos devuelve a la pantalla de login
 		if(e.getSource() == jmiCerrarSesion) {
 			setVisible(false);
 			new LoginFrame();
+			
+		// al salir cierra la aplicación	
 		} else if(e.getSource() == jmiSalir) {
 			System.exit(0);
-		} else if(e.getSource() == jmiContenidoAyuda) {
 			
+		// muestra el archivo de ayuda	
+		} else if(e.getSource() == jmiContenidoAyuda) {
+			try {
+				String[] rutaAyuda = (getClass().getResource("/help/meventos_ayuda.chm").toString()).split("file:/");
+				Runtime.getRuntime().exec("hh.exe " + rutaAyuda[1]);	
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			
+		// muestra un JOptionPane con información sobre la aplicación	
 		} else if(e.getSource() == jmiAcercaDe) {
-			JOptionPane.showMessageDialog(this, "Aplicación realizada para los modulos de:\n\t- Diseño de interfaces"
+			JOptionPane.showMessageDialog(this, "Aplicación realizada para los módulos de:\n\t- Diseño de interfaces"
 					+ "\n\t- Acceso a Datos\n\t- Sistemas de gestión empresarial\n\nPor los alumnos:"
 					+ "\n\t- Javier Morales\n\t- Luis Morales");
+			
+		// confirmamo si quiere borrar un evento seleccionado en la BBDD para realizarlo en caso afirmativo	
 		} else if(e.getSource() == botonBorrarEvento) {
 			if(JOptionPane.showConfirmDialog(this, "Esta seguro que desea borrar el evento: " + evento.getDenominacion(),
 														"Borrar evento", JOptionPane.OK_CANCEL_OPTION,
 														JOptionPane.PLAIN_MESSAGE) == JOptionPane.OK_OPTION) {
-				System.out.println(ciudadEventos.get(filaDispo).getIdCiudadEvento());
 				Borrados.borrarEventoDisponible(ciudadEventos.get(filaDispo).getIdCiudadEvento());
 				modeloTablaEventosDisponibles.removeRow(filaDispo);
 				JOptionPane.showMessageDialog(this, "Evento \"" + evento.getDenominacion() + "\" ha sido borrado con exito");
 			}
 			
+		// si un usuario no está ya suscrito lo suscribimos a un evento, si ya está se lo notificamos	
 		} else if(e.getSource() == botonSuscribirse) {
 			Iterator iter = Consultas.consultarSiEstasuscrito(usuario.getIdUsuario(), evento.getIdEvento());
 			
@@ -422,10 +474,14 @@ public class PanelMEvento extends JFrame implements ActionListener {
 				JOptionPane.showMessageDialog(this, "Te has suscrito al evento: " + evento.getDenominacion());
 				modeloTablaEventosSuscrito.addRow(new Object[] {evento.getDenominacion(), evento.getFecha()});
 			}
+			
+		// guardamos la valoración escrita sobre un evento	
 		} else if(e.getSource() == botonGuardarValoracion) {
 			Actualizar.actualizarNotaEvento(arrayEventosSuscrito.get(filaSuscrito), jtaValoracion.getText());
 			JOptionPane.showMessageDialog(this, "Anotaciones actualizadas para el evento: "
 									+ arrayEventosSuscrito.get(filaSuscrito).getEvento().getDenominacion());
+			
+		// pregunta si realmente desea borrar como usuario, para hacerlo en caso afirmativo	
 		} else if(e.getSource() == botonBorrarUsuario) {
 			if(JOptionPane.showConfirmDialog(this, "Esta seguro que desea borrar su usuario", "Borrar Usuario", JOptionPane.OK_CANCEL_OPTION,
 																JOptionPane.PLAIN_MESSAGE) == JOptionPane.OK_OPTION) {
@@ -433,11 +489,24 @@ public class PanelMEvento extends JFrame implements ActionListener {
 					setVisible(false);
 					new LoginFrame();		
 			}
-		} else if(e.getSource() == botonGuardarDatosUsuario) {			
-			Actualizar.actualizarUsuario(usuario, panelRegistro.getNombre().trim(), panelRegistro.getApellidos().trim(),
-					panelRegistro.getEdad().trim(), panelRegistro.getTelefono().trim(), panelRegistro.getEmail().trim(),
-					panelRegistro.getPassword().trim());
-			JOptionPane.showMessageDialog(this, "Usuario: " + usuario.getNombre().trim() + " actualizado");
+			
+		// actualiza los datos de usuario si ningun campo está vaco	
+		} else if(e.getSource() == botonGuardarDatosUsuario) {
+			String nombreActualizado = panelRegistro.getNombre().trim();
+			String apellidosActualizado = panelRegistro.getApellidos().trim();
+			String edadActualizada = panelRegistro.getEdad().trim();
+			String telefonoActualizado = panelRegistro.getTelefono().trim();
+			String emailActualizado = panelRegistro.getEmail().trim();
+			String passwordActualizado = panelRegistro.getPassword().trim();
+			
+			if(nombreActualizado.isEmpty() || apellidosActualizado.isEmpty() || edadActualizada.isEmpty() 
+					|| telefonoActualizado.isEmpty() || emailActualizado.isEmpty() || passwordActualizado.isEmpty()) {
+				JOptionPane.showMessageDialog(this, "Debes rellenar todos los datos");
+			} else {
+				Actualizar.actualizarUsuario(usuario, nombreActualizado, apellidosActualizado, edadActualizada,
+												telefonoActualizado, emailActualizado, passwordActualizado);
+				JOptionPane.showMessageDialog(this, "Usuario: " + usuario.getNombre().trim() + " actualizado");
+			}
 		}
 	}
 }

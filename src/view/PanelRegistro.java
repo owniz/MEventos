@@ -1,6 +1,5 @@
 package view;
 
-import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,15 +11,24 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.text.MaskFormatter;
 
+/*
+ * Panel utilizado para el registro y modificación de usuario
+ */
+
 public class PanelRegistro extends JPanel implements ActionListener {
+	
+	// componentes de la vista
 	private JFormattedTextField campoNombre, campoApellidos, campoTelefono, campoEmail, campoPassword;
 	private JComboBox jcbEdad;
+	
+	// selección de la edad en el JComboBox
 	private int edadSeleccionada;
 
 	public PanelRegistro() {
 		iniciarGUI();
 	}
 	
+	// getters y setters
 	public String getNombre() {
 		return campoNombre.getText().trim();
 	}
@@ -69,9 +77,11 @@ public class PanelRegistro extends JPanel implements ActionListener {
 		campoPassword.setText(password);
 	}
 	
+	// iniciamos y declaramos los componentes
 	public void iniciarGUI() {
 		setLayout(new GridLayout(6, 2, 8, 8));
 		
+		// sección nombre
 		JLabel jlNombre = new JLabel("Nombre: ", JLabel.RIGHT);
 		try {
 			MaskFormatter formatter = new MaskFormatter("***********************"
@@ -83,6 +93,7 @@ public class PanelRegistro extends JPanel implements ActionListener {
 		add(jlNombre);
 		add(campoNombre);
 		
+		// sección apellidos
 		JLabel jlApellidos = new JLabel("Apellidos: ", JLabel.RIGHT);
 		try {
 			MaskFormatter formatter = new MaskFormatter("***********************"
@@ -94,6 +105,7 @@ public class PanelRegistro extends JPanel implements ActionListener {
 		add(jlApellidos);
 		add(campoApellidos);
 		
+		// sección edad
 		JLabel jlEdad = new JLabel("Edad: ", JLabel.RIGHT);
 		String[] edades = {"14", "15", "16", "17", "18", "19", "20", "21", "22", "23",
 							"24", "25", "26", "27", "28", "29", "30", "31", "32", "33",
@@ -110,6 +122,7 @@ public class PanelRegistro extends JPanel implements ActionListener {
 		add(jlEdad);
 		add(jcbEdad);
 		
+		// sección teléfono
 		JLabel jlTelefono = new JLabel("Teléfono: ", JLabel.RIGHT);
 		try {
 			MaskFormatter formatter = new MaskFormatter("*********");
@@ -120,6 +133,7 @@ public class PanelRegistro extends JPanel implements ActionListener {
 		add(jlTelefono);
 		add(campoTelefono);
 		
+		// sección email
 		JLabel jlEmail = new JLabel("Email: ", JLabel.RIGHT);
 		try {
 			MaskFormatter formatter = new MaskFormatter("********************");
@@ -130,6 +144,7 @@ public class PanelRegistro extends JPanel implements ActionListener {
 		add(jlEmail);
 		add(campoEmail);
 		
+		// sección password
 		JLabel jlPassword = new JLabel("Contraseña: ", JLabel.RIGHT);
 		try {
 			MaskFormatter formatter = new MaskFormatter("****************************************");
@@ -141,6 +156,7 @@ public class PanelRegistro extends JPanel implements ActionListener {
 		add(campoPassword);
 	}
 
+	// recoge la edad selecciona en el JComboBox
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		edadSeleccionada = jcbEdad.getSelectedIndex() + 14;

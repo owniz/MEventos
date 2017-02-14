@@ -5,6 +5,10 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 import view.LoginFrame;
 
+/*
+ * Clase principal
+ */
+
 public class MEvento {
 	public static void main(String[] args) {
 		/*try {

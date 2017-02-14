@@ -9,14 +9,22 @@ import javax.swing.table.DefaultTableModel;
 
 import controller.Consultas;
 
+/*
+ * Clase que define el modelo de la tabla utilizada para mostrar los datos de los eventos disponibles
+ */
+
 public class ModeloTablaEventos extends DefaultTableModel {
+	
+	// tipo de objeto para cada columna
 	Class tipos[] = {String.class, String.class, String.class, String.class, String.class};
 	
+	// modelo y recogida de datos
 	public ModeloTablaEventos() {
+		
+		// número de columnas
 		int numeroColumnas = 5;
 		
-		JFrame frame = new JFrame("DemoTablaEvento");
-		
+		// realizamos la consulta y guardamos cada dato
 		Iterator iter = Consultas.consultarCiudadEvento();
 
 		ArrayList<String> nombrEventos = new ArrayList<>();
@@ -28,6 +36,7 @@ public class ModeloTablaEventos extends DefaultTableModel {
 		while(iter.hasNext()) {
 			CiudadEvento ciudadEvento = (CiudadEvento) iter.next();
 			
+			// solo almacenamos eventos que no haya pasado la fecha
 			if((ciudadEvento.getEvento().getFecha()).after(new Date())) {
 				nombrEventos.add(ciudadEvento.getEvento().getDenominacion());
 				horaInicio.add(ciudadEvento.getEvento().getHoraInicio());
@@ -37,8 +46,10 @@ public class ModeloTablaEventos extends DefaultTableModel {
 			}	
 		}
 		
+		// cabecera de la tabla
 		String[] columnas = {"Nombre Evento", "Hora Inicio", "Hora Fin", "Fecha", "Ciudad"};
 
+		// almacenamos cada fila con su dato corrrespondiente
 		Object[][] filas = new Object[nombrEventos.size()][numeroColumnas];
 		
 		for(int i = 0; i < nombrEventos.size(); i++) {
@@ -58,15 +69,18 @@ public class ModeloTablaEventos extends DefaultTableModel {
 			}
 		}
 		
+		// establecemos los datos de la tabla
 		setDataVector(filas, columnas);		
 	}
 	
+	// hacemos que no se pueda modificar la tabla
 	@Override
 	public boolean isCellEditable(int row, int column) {
 		return false;
 	};
 	
-	// para pintar cada celda diferente
+	// Si la tabla contiene mas de un tipo de objeto este método es necesario
+	// para su correcta visualización
 	@Override
 	public Class getColumnClass(int indice) {
 		return tipos[indice];

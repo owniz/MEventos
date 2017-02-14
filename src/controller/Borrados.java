@@ -6,7 +6,13 @@ import models.CiudadEvento;
 import models.Usuario;
 import utils.ConexionBaseDatos;
 
+/*
+ * Clase para realizar los borrados de la BBDD
+ */
+
 public class Borrados {
+	
+	// borramos eventos disponibles
 	public static void borrarEventoDisponible(int idEventoDisponible) {
 		Session sesion = ConexionBaseDatos.conectarBBDD();
 		
@@ -18,6 +24,7 @@ public class Borrados {
 		sesion.close();
 	}
 	
+	// borramos nuestro usuario
 	public static void borrarUsuario(int idUsuario) {		
 		Session sesion = ConexionBaseDatos.conectarBBDD();
 		

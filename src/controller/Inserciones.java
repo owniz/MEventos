@@ -8,21 +8,13 @@ import models.EventoSuscrito;
 import models.Usuario;
 import utils.ConexionBaseDatos;
 
+/*
+ * Clase para realizar las inserciones a la BBDD
+ */
+
 public class Inserciones {
-	public static void insertarCiudad(String nombre, String provincia) {
-		Session sesion = ConexionBaseDatos.conectarBBDD();
-		
-		Ciudad ciudad = new Ciudad();
-		
-		ciudad.setNombreCiudad(nombre);
-		ciudad.setProvincia(provincia);
-		
-		sesion.beginTransaction();
-		sesion.persist(ciudad);
-		sesion.getTransaction().commit();
-		sesion.close();
-	}
 	
+	// inserta un evento a la tabla de eventos suscritos
 	public static void insertarEventoSuscrito(Usuario usuario, Evento evento) {
 		Session sesion = ConexionBaseDatos.conectarBBDD();
 		
@@ -38,6 +30,7 @@ public class Inserciones {
 		sesion.close();
 	}
 	
+	// insertamos un nuevo usuario
 	public static void insertarUsuario(String nombre, String apellidos, int edad, String telefono, String email, String password) {
 		Session sesion = ConexionBaseDatos.conectarBBDD();
 		

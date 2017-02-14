@@ -9,14 +9,23 @@ import javax.swing.table.DefaultTableModel;
 
 import controller.Consultas;
 
+/*
+ * Clase que define el modelo de la tabla utilizada para mostrar los datos de los eventos
+ * a los que se ha suscrito un usuario
+ */
+
 public class ModeloTablaEventosSuscrito extends DefaultTableModel {
+	
+	// tipo de objeto para cada columna
 	Class tipos[] = {String.class, String.class};
 	
+	// modelo y recogida de datos
 	public ModeloTablaEventosSuscrito(int idUsuario) {
+		
+		// número de columnas
 		int numeroColumnas = 2;
-		
-		JFrame frame = new JFrame("DemoTablaEventoSuscrito");
-		
+
+		// realizamos la consulta y guardamos cada dato
 		Iterator iter = Consultas.consultarEventoSuscrito(idUsuario);
 
 		ArrayList<String> nombreEventos = new ArrayList<>();
@@ -29,10 +38,12 @@ public class ModeloTablaEventosSuscrito extends DefaultTableModel {
 			fechaEventos.add((Date) eventoSuscrito.getEvento().getFecha());
 		}
 		
+		// cabecera de la tabla
 		String[] columnas = {"Nombre Evento", "Fecha"};
 
 		Object[][] filas = new Object[nombreEventos.size()][numeroColumnas];
 		
+		// almacenamos cada fila con su dato corrrespondiente
 		for(int i = 0; i < nombreEventos.size(); i++) {
 			for(int j = 0; j < numeroColumnas; j++) {
 				if(j == (nombreEventos.size() + j) - nombreEventos.size()) {
@@ -44,15 +55,18 @@ public class ModeloTablaEventosSuscrito extends DefaultTableModel {
 			}
 		}
 		
+		// establecemos los datos de la tabla
 		setDataVector(filas, columnas);		
 	}
 	
+	// hacemos que no se pueda modificar la tabla
 	@Override
 	public boolean isCellEditable(int row, int column) {
 		return false;
 	};
 	
-	// para pintar cada celda diferente
+	// Si la tabla contiene mas de un tipo de objeto este método es necesario
+	// para su correcta visualización
 	@Override
 	public Class getColumnClass(int indice) {
 		return tipos[indice];
