@@ -322,8 +322,8 @@ public class PanelMEvento extends JFrame implements ActionListener {
 				}
 					
 				// almacenamos la fila sobre la que se ha pusaldo
-				filaSuscrito = tablaEventosDisponibles.rowAtPoint(e.getPoint());
-				
+				filaSuscrito = tablaEventosSuscrito.rowAtPoint(e.getPoint());
+
 				// si es mayor o igual a 0 mostramos la imagen y las notas del evento
 				if(filaSuscrito >= 0) {
 					jtaValoracion.setText(valoracionEventos.get(filaSuscrito));
@@ -469,17 +469,24 @@ public class PanelMEvento extends JFrame implements ActionListener {
 					+ "\n\t- Acceso a Datos\n\t- Sistemas de gestión empresarial\n\nPor los alumnos:"
 					+ "\n\t- Javier Morales\n\t- Luis Morales");
 			
-		// confirmamo si quiere borrar un evento seleccionado en la BBDD para realizarlo en caso afirmativo	
+		// confirmamo si quiere borrar un evento seleccionado en la BBDD para realizarlo en caso afirmativo
+		// mientras no haya ningún usuario ya inscrito	
 		} else if(e.getSource() == botonBorrarEvento) {
 			if(JOptionPane.showConfirmDialog(this, "Esta seguro que desea borrar el evento: " + evento.getDenominacion(),
 														"Borrar evento", JOptionPane.OK_CANCEL_OPTION,
 														JOptionPane.PLAIN_MESSAGE) == JOptionPane.OK_OPTION) {
-				Borrados.borrarEventoDisponible(eventos.get(filaDispo).getIdEvento());
-				modeloTablaEventosDisponibles.removeRow(filaDispo);
-				JOptionPane.showMessageDialog(this, "Evento \"" + evento.getDenominacion() + "\" ha sido borrado con exito");
+				Iterator iter = Consultas.consultarEventoSuscritoPorIDEvento(evento.getIdEvento());
 				
-				jtaDescripcion.setText(" ");
-				jlCiudad.setText(" ");
+				if(iter.hasNext()) {
+					JOptionPane.showMessageDialog(this, "No puedes borrar este evento ya que hay gente inscrita a él");
+				} else {
+					Borrados.borrarEventoDisponible(eventos.get(filaDispo).getIdEvento());
+					modeloTablaEventosDisponibles.removeRow(filaDispo);
+					JOptionPane.showMessageDialog(this, "Evento \"" + evento.getDenominacion() + "\" ha sido borrado con exito");
+					
+					jtaDescripcion.setText(" ");
+					jlCiudad.setText(" ");
+				}	
 			}
 			
 		// si un usuario no está ya suscrito lo suscribimos a un evento, si ya está se lo notificamos	
