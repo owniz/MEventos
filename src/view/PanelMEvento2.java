@@ -48,7 +48,7 @@ import models.Usuario;
  * el panel de usuario 
  */
 
-public class PanelMEvento extends JFrame implements ActionListener {
+public class PanelMEvento2 extends JFrame implements ActionListener {
 	
 	// componentes visuales
 	private JPanel jpGeneral, jpTabEventosDisponibles, jpTabEventosSuscritos, jpTabUsuario;
@@ -56,7 +56,7 @@ public class PanelMEvento extends JFrame implements ActionListener {
 	private JMenu menuArchivo, menuAyuda;
 	private JMenuItem jmiCerrarSesion, jmiSalir, jmiContenidoAyuda, jmiAcercaDe;
 	private JTabbedPane jtpTabs;
-	private JLabel jlTituloEventosDispo, jlTituloEventosSus, jlTituloUsuario, jlTituloCiudad, jlCiudad; 
+	private JLabel jlTituloEventosDispo, jlTituloEventosSus, jlTituloUsuario; 
 	private JLabel jlTituloDescripcion, jlTituloValorarion, jlImagenEvento, jlImagenEventoSuscrito;
 	private JTextArea jtaDescripcion;
 	private JFormattedTextField jtaValoracion;
@@ -67,7 +67,7 @@ public class PanelMEvento extends JFrame implements ActionListener {
 	
 	// Arrays que almacenan los datos de las tablas
 	private ArrayList<Evento> eventos;
-	//private ArrayList<CiudadEvento> ciudadEventos;
+	private ArrayList<CiudadEvento> ciudadEventos;
 	private ArrayList<EventoSuscrito> arrayEventosSuscrito;	
 	
 	// modelos de tablas
@@ -78,12 +78,13 @@ public class PanelMEvento extends JFrame implements ActionListener {
 	private Usuario usuario;
 	private Evento evento;
 	private EventoSuscrito eventoSuscrito;
+	private CiudadEvento ciudadEvento;
 	
 	// almacemos las filas donde se pulsa en cada tabla
 	private int filaDispo;
 	private int filaSuscrito;
 	
-	public PanelMEvento(Usuario usuario) {
+	public PanelMEvento2(Usuario usuario) {
 		super("MEvento");
 		this.usuario = usuario;
 		iniciarGUI();
@@ -179,6 +180,8 @@ public class PanelMEvento extends JFrame implements ActionListener {
 		tablaEventosDisponibles.getColumnModel().getColumn(2).setMinWidth(80);
 		tablaEventosDisponibles.getColumnModel().getColumn(3).setMaxWidth(80);
 		tablaEventosDisponibles.getColumnModel().getColumn(3).setMinWidth(80);
+		tablaEventosDisponibles.getColumnModel().getColumn(4).setMaxWidth(100);
+		tablaEventosDisponibles.getColumnModel().getColumn(4).setMinWidth(100);
 		tablaEventosDisponibles.addMouseListener(new MouseListener() {
 
 			// comportamiento al pulsar sobre la tabla de eventos diponibles
@@ -196,19 +199,21 @@ public class PanelMEvento extends JFrame implements ActionListener {
 				}
 				
 				// mostramos los eventos disponibles
-				Iterator iter = Consultas.consultarEvento();
+				Iterator iter = Consultas.consultarCiudadEvento();
 				 
 				ArrayList<String> descripcionEventos = new ArrayList<>();
 				ArrayList<String> imagenEventos = new ArrayList<>();
 				eventos = new ArrayList<>();
+				ciudadEventos = new ArrayList<>();
 				
 				while(iter.hasNext()) {
-					evento = (Evento) iter.next();
+					ciudadEvento = (CiudadEvento) iter.next();
 					
-					eventos.add(evento);
+					ciudadEventos.add(ciudadEvento);
+					eventos.add(ciudadEvento.getEvento());
 					
-					descripcionEventos.add(evento.getDescripcion());
-					imagenEventos.add(evento.getPath());
+					descripcionEventos.add(ciudadEvento.getEvento().getDescripcion());
+					imagenEventos.add(ciudadEvento.getEvento().getPath());
 				}
 				
 				// guardamos la fila que es pulsada
@@ -217,18 +222,9 @@ public class PanelMEvento extends JFrame implements ActionListener {
 				// si es mayor o igual a 0 mostramos la información y la imagen
 				// recuperamos además el evento
 				if(filaDispo >= 0) {
-					jtaDescripcion.setText(descripcionEventos.get(filaDispo));
-					ponerImagenEventoDispo(imagenEventos.get(filaDispo));
-					evento = eventos.get(filaDispo);
-				}
-				
-				// recuperamos la ciduad asociada al evento puslado para mostrarla
-				Iterator iterCiudad = Consultas.consultarCiudadEventoPorIdEvento(eventos.get(filaDispo).getIdEvento());
-				
-				while(iterCiudad.hasNext()) {
-					CiudadEvento ciudadEvento = (CiudadEvento) iterCiudad.next();
-					
-					jlCiudad.setText(ciudadEvento.getCiudad().getNombreCiudad());
+					jtaDescripcion.setText(descripcionEventos.get(filaDispo + 1));
+					ponerImagenEventoDispo(imagenEventos.get(filaDispo + 1));
+					evento = eventos.get(filaDispo + 1);
 				}
 			}
 
@@ -259,21 +255,9 @@ public class PanelMEvento extends JFrame implements ActionListener {
 		jtaDescripcion.setLineWrap(true); // las líneas bajan al completar la fila
 		jtaDescripcion.setWrapStyleWord(true); // no corta las palabras
 		jtaDescripcion.setEditable(false);
-		jtaDescripcion.setBounds(40, 340, 300, 40);
+		jtaDescripcion.setBounds(40, 340, 300, 60);
 		jtaDescripcion.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 14));
 		jpTabEventosDisponibles.add(jtaDescripcion);
-		
-		// titulo ciudad
-		jlTituloCiudad = new JLabel("Ciudad: ");
-		jlTituloCiudad.setBounds(10, 390, 80, 18);
-		jlTituloCiudad.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 16));
-		jpTabEventosDisponibles.add(jlTituloCiudad);
-	
-		// ciudad
-		jlCiudad = new JLabel();
-		jlCiudad.setBounds(90, 390, 100, 18);
-		jlCiudad.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 16));
-		jpTabEventosDisponibles.add(jlCiudad);
 		
 		// imagen del evento
 		jlImagenEvento = new JLabel();
@@ -474,12 +458,9 @@ public class PanelMEvento extends JFrame implements ActionListener {
 			if(JOptionPane.showConfirmDialog(this, "Esta seguro que desea borrar el evento: " + evento.getDenominacion(),
 														"Borrar evento", JOptionPane.OK_CANCEL_OPTION,
 														JOptionPane.PLAIN_MESSAGE) == JOptionPane.OK_OPTION) {
-				Borrados.borrarEventoDisponible(eventos.get(filaDispo).getIdEvento());
+				Borrados.borrarEventoDisponible(ciudadEventos.get(filaDispo).getIdCiudadEvento());
 				modeloTablaEventosDisponibles.removeRow(filaDispo);
 				JOptionPane.showMessageDialog(this, "Evento \"" + evento.getDenominacion() + "\" ha sido borrado con exito");
-				
-				jtaDescripcion.setText(" ");
-				jlCiudad.setText(" ");
 			}
 			
 		// si un usuario no está ya suscrito lo suscribimos a un evento, si ya está se lo notificamos	

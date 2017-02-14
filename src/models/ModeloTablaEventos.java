@@ -16,38 +16,35 @@ import controller.Consultas;
 public class ModeloTablaEventos extends DefaultTableModel {
 	
 	// tipo de objeto para cada columna
-	Class tipos[] = {String.class, String.class, String.class, String.class, String.class};
+	Class tipos[] = {String.class, String.class, String.class, String.class};
 	
 	// modelo y recogida de datos
 	public ModeloTablaEventos() {
 		
 		// número de columnas
-		int numeroColumnas = 5;
+		int numeroColumnas = 4;
 		
 		// realizamos la consulta y guardamos cada dato
-		Iterator iter = Consultas.consultarCiudadEvento();
+		Iterator iter = Consultas.consultarEvento();
 
 		ArrayList<String> nombrEventos = new ArrayList<>();
 		ArrayList<String> horaInicio = new ArrayList<>();
 		ArrayList<String> horaFin = new ArrayList<>();
 		ArrayList<String> fechas = new ArrayList<>();
-		ArrayList<String> ciudad = new ArrayList<>();
 		
 		while(iter.hasNext()) {
-			CiudadEvento ciudadEvento = (CiudadEvento) iter.next();
+			Evento evento = (Evento) iter.next(); 
 			
 			// solo almacenamos eventos que no haya pasado la fecha
-			if((ciudadEvento.getEvento().getFecha()).after(new Date())) {
-				nombrEventos.add(ciudadEvento.getEvento().getDenominacion());
-				horaInicio.add(ciudadEvento.getEvento().getHoraInicio());
-				horaFin.add(ciudadEvento.getEvento().getHoraFin());
-				fechas.add(ciudadEvento.getEvento().getFecha().toString());
-				ciudad.add(ciudadEvento.getCiudad().getNombreCiudad());	
-			}	
+			nombrEventos.add(evento.getDenominacion());
+			horaInicio.add(evento.getHoraInicio());
+			horaFin.add(evento.getHoraFin());
+			fechas.add(evento.getFecha().toString());		
 		}
 		
+		
 		// cabecera de la tabla
-		String[] columnas = {"Nombre Evento", "Hora Inicio", "Hora Fin", "Fecha", "Ciudad"};
+		String[] columnas = {"Nombre Evento", "Hora Inicio", "Hora Fin", "Fecha"};
 
 		// almacenamos cada fila con su dato corrrespondiente
 		Object[][] filas = new Object[nombrEventos.size()][numeroColumnas];
@@ -63,8 +60,6 @@ public class ModeloTablaEventos extends DefaultTableModel {
 						filas[i][j] = horaFin.get(i);
 					if(j == 3)
 						filas[i][j] = fechas.get(i);
-					if(j == 4)
-						filas[i][j] = ciudad.get(i);
 				}
 			}
 		}

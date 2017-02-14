@@ -28,6 +28,14 @@ public class Consultas {
 		return iter;
 	}
 	
+	// consultas a la tabla que contiene los datos de las ciudades y los eventos por la id del evento
+	public static Iterator consultarCiudadEventoPorIdEvento(int idEvento) {
+		Session sesion = ConexionBaseDatos.conectarBBDD();		
+		Iterator iter = sesion.createQuery("from CiudadEvento where id_evento = " +idEvento).iterate();		
+		
+		return iter;
+	}
+		
 	// consultas a la tabla que contiene los datos de los eventos
 	public static Iterator consultarEvento() {
 		Session sesion = ConexionBaseDatos.conectarBBDD();		
